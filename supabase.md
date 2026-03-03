@@ -1,0 +1,8 @@
+project url
+
+https://pcgzjsvzwosfifxnpgul.supabase.co
+
+
+
+API keys :
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBjZ3pqc3Z6d29zZmlmeG5wZ3VsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0NDI1MjMsImV4cCI6MjA4ODAxODUyM30.UFBUgyy7ktkviVz728KxOR7AcKepOqZJBC8GVNX0dCo
