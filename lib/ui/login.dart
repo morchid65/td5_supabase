@@ -1,20 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:td5_supabase/ui/profil.dart';
-import 'package:td5_supabase/ui/registration.dart';
+import 'profil.dart';
+import 'registration.dart';
 import '../main.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
-
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-  AuthResponse? response;
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  bool _isLoading = false;
+
+  Future<void> _signIn() async {
+    setState(() => _isLoading = true);
+    try {
+      final res = await supabase.auth.signInWithPassword(
+        email: emailController.text.trim(),
+        password: passwordController.text,
+      );
+      if (res.user != null && mounted) {
+        Navigator.pushReplacement(
+          context, 
+          MaterialPageRoute(builder: (context) => const ProfileForm())
+        );
+      }
+    } catch (e) {
+      if (mounted) context.showSnackBar(e.toString(), isError: true);
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,58 +43,17 @@ class _LoginScreenState extends State<LoginScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            TextField(
-              controller: emailController,
-              decoration: const InputDecoration(labelText: 'Email'),
-            ),
-            TextField(
-              controller: passwordController,
-              decoration: const InputDecoration(labelText: 'Password'),
-              obscureText: true,
-            ),
+            TextField(controller: emailController, decoration: const InputDecoration(labelText: 'Email')),
+            TextField(controller: passwordController, decoration: const InputDecoration(labelText: 'Password'), obscureText: true),
             const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () async {
-                try {
-                  response = await supabase.auth.signInWithPassword(
-                    email: emailController.text,
-                    password: passwordController.text,
-                  );
-                } catch (e) {
-                  if (mounted) {
-                    context.showSnackBar(e.toString(), isError: true);
-                  }
-                } 
-
-                if (response?.user != null && mounted) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => ProfileForm()),
-                  );
-                }
-              },
-              child: const Text('Login'),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => RegistrationScreen()),
-                );
-              },
-              child: const Text('Register'),
+            ElevatedButton(onPressed: _isLoading ? null : _signIn, child: const Text('Login')),
+            TextButton(
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const RegistrationScreen())),
+              child: const Text("Pas de compte ? S'inscrire"),
             ),
           ],
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    emailController.dispose();
-    passwordController.dispose();
-    super.dispose();
   }
 }
